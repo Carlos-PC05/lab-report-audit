@@ -1,0 +1,47 @@
+{
+  "total": 6,
+  "issues": [
+    {
+      "rule": "python:S2068",
+      "severity": "MAJOR",
+      "component": "Carlos-PC05_reportaudit-lab:app/reporte_auditoria.py",
+      "line": 22,
+      "status": "OPEN"
+    },
+    {
+      "rule": "secrets:S7552",
+      "severity": "BLOCKER",
+      "component": "Carlos-PC05_reportaudit-lab:app/reporte_auditoria.py",
+      "line": 22,
+      "status": "OPEN"
+    },
+    {
+      "rule": "pythonsecurity:S3649",
+      "severity": "BLOCKER",
+      "component": "Carlos-PC05_reportaudit-lab:app/reporte_auditoria.py",
+      "line": 42,
+      "status": "OPEN"
+    },
+    {
+      "rule": "pythonsecurity:S2076",
+      "severity": "BLOCKER",
+      "component": "Carlos-PC05_reportaudit-lab:app/reporte_auditoria.py",
+      "line": 51,
+      "status": "OPEN"
+    },
+    {
+      "rule": "python:S4790",
+      "severity": "CRITICAL",
+      "component": "Carlos-PC05_reportaudit-lab:app/reporte_auditoria.py",
+      "line": 57,
+      "status": "OPEN"
+    },
+    {
+      "rule": "python:S4502",
+      "severity": "CRITICAL",
+      "component": "Carlos-PC05_reportaudit-lab:app/servicio.py",
+      "line": 25,
+      "status": "OPEN"
+    }
+  ]
+}

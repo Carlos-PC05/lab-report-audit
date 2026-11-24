@@ -20,7 +20,7 @@ Esta tabla es una revisión del código antiguo. No es una captura de la auditor
 
 ## Partes G y H. Detección antes de corregir
 
-CodeQL tenía [cuatro alertas abiertas](evidencias/codeql-antes.json): SQL, comandos, hash débil y registro de datos sensibles. Semgrep [terminó con código 1](evidencias/semgrep-antes.txt) y tres hallazgos bloqueantes. El código 1 sirve como evidencia de que el hook detectó problemas. El código 2 que apareció antes era un fallo del motor, que dejó de ocurrir al usar Python 3.12 para el hook. No se ha recuperado la captura original del commit bloqueado.
+SonarQube Cloud tenía [seis vulnerabilidades abiertas](evidencias/sonar-antes.json) y cero hotspots en `main`. CodeQL tenía [cuatro alertas abiertas](evidencias/codeql-antes.json): SQL, comandos, hash débil y registro de datos sensibles. Semgrep [terminó con código 1](evidencias/semgrep-antes.txt) y tres hallazgos bloqueantes. El código 1 sirve como evidencia de que el hook detectó problemas. El código 2 que apareció antes era un fallo del motor, que dejó de ocurrir al usar Python 3.12 para el hook. No se ha recuperado la captura original del commit bloqueado.
 
 ## Parte I. Dependabot
 
@@ -64,7 +64,7 @@ El [SBOM](evidencias/sbom.cyclonedx.json) es CycloneDX 1.7. Hay 2 dependencias d
 
 En el [PR #25](https://github.com/Carlos-PC05/lab-report-audit/pull/25) la consulta usa parámetros; para el PDF se valida el nombre y se llama al conversor sin shell; YAML se lee con `safe_load`; el hash usa PBKDF2 con sal y los valores de configuración salen de variables de entorno. El registro solo dice si la clave está configurada. Los valores sembrados son de práctica según la guía. Si se hubieran reutilizado credenciales reales, habría que rotarlas en su proveedor.
 
-[Pruebas locales](evidencias/verificacion-auditoria.txt): la consulta devolvió dos reportes para `acme_corp` y uno para el cliente con apóstrofo. Un nombre con espacio o con ruta recibió HTTP 400. Para el nombre válido se simuló la llamada a `wkhtmltopdf` porque el binario no estaba instalado. Semgrep pasó después del cambio.
+[Pruebas locales](evidencias/verificacion-auditoria.txt): la consulta devolvió dos reportes para `acme_corp` y uno para el cliente con apóstrofo. Un nombre con espacio o con ruta recibió HTTP 400. Para el nombre válido se simuló la llamada a `wkhtmltopdf` porque el binario no estaba instalado. Semgrep pasó después del cambio. Las cuatro pruebas añadidas al CI pasaron localmente con Python 3.12 y cubrieron el 94 % de las líneas del módulo de lógica.
 
 Quedan por revisar el PR, sus checks y las alertas tras el merge. La actualización de dependencias va en otro PR. CodeQL señala el código de la aplicación; Dependabot mira versiones de paquetes. Por eso corregir uno de los dos grupos no cierra automáticamente el otro.
 
@@ -74,7 +74,7 @@ Quedan por revisar el PR, sus checks y las alertas tras el merge. La actualizaci
 | --- | --- | --- |
 | Semgrep, archivos de `app/` | 3 hallazgos bloqueantes | 0 bloqueantes en la rama del PR #25 |
 | CodeQL, alertas abiertas en `main` | 4 | Pendiente de fusionar y comprobar |
-| SonarQube Cloud, vulnerabilidades y hotspots de `main` | Pendiente de consultar el panel | Pendiente |
+| SonarQube Cloud, vulnerabilidades y hotspots de `main` | 6 vulnerabilidades y 0 hotspots | Pendiente de fusionar y comprobar |
 | Grype, avisos del SBOM | 13 | Pendiente de actualizar dependencias |
 | Trivy, avisos del lockfile | 13 | Pendiente de actualizar dependencias |
 | Dependabot, alertas abiertas | 12 | Pendiente de actualizar dependencias |
