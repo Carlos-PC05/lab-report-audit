@@ -1,0 +1,17 @@
+[
+  {
+    "rule": "python.lang.security.deserialization.avoid-pyyaml-load.avoid-pyyaml-load",
+    "path": "app/reporte_auditoria.py",
+    "line": 33
+  },
+  {
+    "rule": "python.lang.security.insecure-hash-algorithms-md5.insecure-hash-algorithm-md5",
+    "path": "app/reporte_auditoria.py",
+    "line": 57
+  },
+  {
+    "rule": "python.lang.security.audit.md5-used-as-password.md5-used-as-password",
+    "path": "app/reporte_auditoria.py",
+    "line": 57
+  }
+]

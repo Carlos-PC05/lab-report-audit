@@ -22,6 +22,17 @@ Esta tabla es una revisión del código antiguo. No es una captura de la auditor
 
 SonarQube Cloud tenía [seis vulnerabilidades abiertas](evidencias/sonar-antes.json) y cero hotspots en `main`. CodeQL tenía [cuatro alertas abiertas](evidencias/codeql-antes.json): SQL, comandos, hash débil y registro de datos sensibles. Semgrep [terminó con código 1](evidencias/semgrep-antes.txt) y tres hallazgos bloqueantes. El código 1 sirve como evidencia de que el hook detectó problemas. El código 2 que apareció antes era un fallo del motor, que dejó de ocurrir al usar Python 3.12 para el hook. No se ha recuperado la captura original del commit bloqueado.
 
+| Hallazgo | SonarQube Cloud | CodeQL | Semgrep | Trivy |
+| --- | --- | --- | --- | --- |
+| H1. SQL | Sí, S3649 | Sí, `py/sql-injection` | No | N/A |
+| H2. Comandos | Sí, S2076 | Sí, `py/command-line-injection` | No | N/A |
+| H3. YAML inseguro | No | No | Sí, `avoid-pyyaml-load` | N/A |
+| H4. MD5 | Sí, S4790 | Sí, `py/weak-sensitive-data-hashing` | Sí, dos reglas de MD5 | N/A |
+| H5. Clave de notificaciones | No | Detectó su registro parcial | No | No observado |
+| H6. Contraseña SMTP | Sí, S2068 y S7552 | No | No | No observado |
+
+Los IDs de Semgrep salen de una [segunda ejecución sobre los mismos archivos de partida](evidencias/semgrep-reglas-antes.json). Las pruebas de SonarQube for IDE en modo local y conectado quedan sin verificar.
+
 ## Parte I. Dependabot
 
 Hay [12 alertas abiertas](evidencias/dependabot-antes.json) y GitHub abrió PR agrupados de seguridad ([#21](https://github.com/Carlos-PC05/lab-report-audit/pull/21) y [#22](https://github.com/Carlos-PC05/lab-report-audit/pull/22)). La configuración ya está en `main` y el [issue #5](https://github.com/Carlos-PC05/lab-report-audit/issues/5) figura cerrado.
