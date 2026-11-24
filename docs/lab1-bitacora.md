@@ -62,9 +62,9 @@ El [SBOM](evidencias/sbom.cyclonedx.json) es CycloneDX 1.7. Hay 2 dependencias d
 
 ## Parte M. Correcciones y verificación
 
-En el [PR #25](https://github.com/Carlos-PC05/lab-report-audit/pull/25) la consulta usa parámetros; para el PDF se valida el nombre y se llama al conversor sin shell; YAML se lee con `safe_load`; el hash usa PBKDF2 con sal y los valores de configuración salen de variables de entorno. El registro solo dice si la clave está configurada. Los valores sembrados son de práctica según la guía. Si se hubieran reutilizado credenciales reales, habría que rotarlas en su proveedor.
+En el [PR #25](https://github.com/Carlos-PC05/lab-report-audit/pull/25) la consulta usa parámetros; para el PDF se valida el nombre, se busca el archivo local y se llama al conversor sin shell; YAML se lee con `safe_load`; el hash usa PBKDF2 con sal y los valores de configuración salen de variables de entorno. El registro solo dice si la clave está configurada. Los valores sembrados son de práctica según la guía. Si se hubieran reutilizado credenciales reales, habría que rotarlas en su proveedor.
 
-[Pruebas locales](evidencias/verificacion-auditoria.txt): la consulta devolvió dos reportes para `acme_corp` y uno para el cliente con apóstrofo. Un nombre con espacio o con ruta recibió HTTP 400. Para el nombre válido se simuló la llamada a `wkhtmltopdf` porque el binario no estaba instalado. Semgrep pasó después del cambio. Las cuatro pruebas añadidas al CI pasaron localmente con Python 3.12 y cubrieron el 94 % de las líneas del módulo de lógica.
+[Pruebas locales](evidencias/verificacion-auditoria.txt): la consulta devolvió dos reportes para `acme_corp` y uno para el cliente con apóstrofo. Un nombre con espacio o con ruta recibió HTTP 400. Para el nombre válido se simuló la llamada a `wkhtmltopdf` porque el binario no estaba instalado. Semgrep pasó después del cambio. Las cuatro pruebas añadidas al CI pasaron localmente con Python 3.12 y cubrieron el 95 % de las líneas del módulo de lógica.
 
 Quedan por revisar el PR, sus checks y las alertas tras el merge. La actualización de dependencias va en otro PR. CodeQL señala el código de la aplicación; Dependabot mira versiones de paquetes. Por eso corregir uno de los dos grupos no cierra automáticamente el otro.
 
@@ -85,4 +85,15 @@ Pendientes de completar con evidencias de las ejecuciones y los PR correspondien
 
 ## Preguntas de comprobación
 
-Pendientes. Las respuestas se añadirán según se verifiquen los resultados de cada bloque.
+1. En el escenario de la guía, Windows aloja el editor y el navegador, Ubuntu en WSL2 contiene el clon, el entorno y las herramientas, y GitHub guarda el repositorio, las revisiones y CI. Aquí trabajé directamente en Linux. La ventaja es ejecutar todo en el mismo entorno.
+2. Flask es directa porque está en `requirements.in`. Werkzeug es transitiva porque Flask la necesita y eso aparece en `# via flask`. Las dos aparecen en el SBOM.
+3. Un *source* es la entrada de datos. Un *sink* es la operación que puede ser peligrosa si esa entrada llega sin tratar. Antes, el parámetro `cliente` de `servicio.py` llegaba a la consulta de SQLite que construía `reporte_auditoria.py`.
+4. El apóstrofo de un nombre normal rompía la cadena SQL porque se pegaba dentro del texto de la consulta. Esto muestra que parte de la entrada podía cambiar cómo SQLite interpreta la orden. Con un parámetro, el apóstrofo forma parte del dato.
+5. Semgrep avisa en el equipo antes de que salga un commit. El análisis en GitHub deja resultados visibles para toda la revisión, incluso si alguien no ejecutó el hook. Los tres dependen de sus reglas y del contexto que reconocen.
+6. Las herramientas tienen alcances distintos. En la medición de partida CodeQL abrió cuatro alertas, Semgrep bloqueó por tres hallazgos, SonarQube mostró seis vulnerabilidades y Trivy marcó trece avisos del lockfile.
+7. Cambiar el código arregla hallazgos de análisis estático. Cambiar las versiones del lockfile retira dependencias afectadas. Cada cambio responde a un tipo diferente de alerta.
+8. Borrar un valor corta su exposición en el archivo actual. Si el valor era real, también hay que invalidarlo o rotarlo, revisar su uso y guardar el sustituto fuera del código. El valor anterior sigue en commits y clones.
+9. Un VEX deja registrada la razón por la que un aviso no afecta a un producto en una configuración concreta. En este proyecto el aviso del depurador de Werkzeug no aplica al arranque documentado porque el depurador está apagado. Aun así conviene actualizar.
+10. El instalador compara el SHA-256 del archivo descargado con el publicado para la versión fijada. La coincidencia comprueba la integridad respecto a esa referencia, pero no demuestra que el proyecto o su canal de publicación estuvieran libres de manipulación.
+
+Preguntas 11 a 17 pendientes de completar con las evidencias de O a T.
