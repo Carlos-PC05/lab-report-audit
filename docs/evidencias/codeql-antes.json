@@ -1,0 +1,1 @@
+[{"number":4,"rule":"py/weak-sensitive-data-hashing","severity":"warning","tool":"CodeQL"},{"number":3,"rule":"py/command-line-injection","severity":"error","tool":"CodeQL"},{"number":2,"rule":"py/sql-injection","severity":"error","tool":"CodeQL"},{"number":1,"rule":"py/clear-text-logging-sensitive-data","severity":"error","tool":"CodeQL"}]

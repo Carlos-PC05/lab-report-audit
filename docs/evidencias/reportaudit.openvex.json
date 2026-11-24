@@ -1,0 +1,27 @@
+{
+  "@context": "https://openvex.dev/ns/v0.2.0",
+  "@id": "https://github.com/Carlos-PC05/lab-report-audit/vex/2026-001",
+  "author": "Carlos Parra Camacho",
+  "timestamp": "2026-11-24T19:44:10+00:00",
+  "version": 1,
+  "statements": [
+    {
+      "vulnerability": {
+        "name": "CVE-2024-34069"
+      },
+      "products": [
+        {
+          "@id": "pkg:github/Carlos-PC05/lab-report-audit@3be9487",
+          "subcomponents": [
+            {
+              "@id": "pkg:pypi/werkzeug@3.0.1"
+            }
+          ]
+        }
+      ],
+      "status": "not_affected",
+      "justification": "vulnerable_code_not_in_execute_path",
+      "impact_statement": "El arranque documentado en app/servicio.py enlaza solo a localhost y conserva debug=False. El depurador interactivo afectado no se inicia en ese modo. Si se habilita el depurador, hay que revisar esta conclusión."
+    }
+  ]
+}
