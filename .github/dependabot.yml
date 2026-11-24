@@ -6,7 +6,7 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-    # 0 = sin PRs de "versión nueva disponible"; solo los de SEGURIDAD
+    # Durante el laboratorio, deja los PRs de pip para los parches de seguridad.
     open-pull-requests-limit: 0
     groups:
       parches-de-seguridad:
