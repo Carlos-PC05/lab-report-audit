@@ -16,6 +16,7 @@ import os
 import sqlite3
 import subprocess
 from contextlib import closing
+from pathlib import Path
 
 import yaml
 
@@ -54,8 +55,17 @@ def convertir_a_pdf(nombre_archivo):
     ):
         raise ValueError("Nombre de archivo no válido")
     salida = nombre_archivo + ".pdf"
+    entrada = next(
+        (
+            ruta for ruta in Path.cwd().glob("*.html")
+            if ruta.name == nombre_archivo and not ruta.is_symlink() and ruta.is_file()
+        ),
+        None,
+    )
+    if entrada is None:
+        return salida
     try:
-        subprocess.run(["wkhtmltopdf", nombre_archivo, salida], check=False)
+        subprocess.run(["wkhtmltopdf", entrada, entrada.with_suffix(".html.pdf")], check=False)
     except FileNotFoundError:
         print("Aviso: wkhtmltopdf no está instalado; no se generó el PDF.")
     return salida

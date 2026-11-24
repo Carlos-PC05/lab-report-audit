@@ -27,16 +27,24 @@ class ReporteAuditoriaTest(unittest.TestCase):
             self.assertEqual(buscar_reportes_cliente("o'brien", ruta), [("o'brien",)])
 
     def test_conversion_acepta_solo_nombres_html_simples(self):
-        with patch("reporte_auditoria.subprocess.run") as conversor:
+        with (
+            TemporaryDirectory() as carpeta,
+            patch("reporte_auditoria.subprocess.run") as conversor,
+            patch("reporte_auditoria.Path.cwd", return_value=Path(carpeta)),
+        ):
             cliente = app.test_client()
             for nombre in ("../informe.html", "informe final.html", "-opcion.html"):
                 with self.subTest(nombre=nombre):
                     respuesta = cliente.get("/convertir", query_string={"archivo": nombre})
                     self.assertEqual(respuesta.status_code, 400)
             conversor.assert_not_called()
+            self.assertEqual(convertir_a_pdf("ausente.html"), "ausente.html.pdf")
+            conversor.assert_not_called()
+            entrada = Path(carpeta) / "informe-1.html"
+            entrada.touch()
             self.assertEqual(convertir_a_pdf("informe-1.html"), "informe-1.html.pdf")
             conversor.assert_called_once_with(
-                ["wkhtmltopdf", "informe-1.html", "informe-1.html.pdf"], check=False
+                ["wkhtmltopdf", entrada, entrada.with_suffix(".html.pdf")], check=False
             )
 
     def test_misma_contrasena_recibe_sales_distintas(self):
