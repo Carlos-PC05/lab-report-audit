@@ -1,0 +1,74 @@
+name: Publicar versión firmada
+
+on:
+  push:
+    tags: ["v*.*.*"]
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    name: Release - SBOM y procedencia
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    env:
+      VERSION: ${{ github.ref_name }}
+    steps:
+      - name: Descargar el código de la etiqueta
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Generar el SBOM en CycloneDX
+        uses: anchore/sbom-action@v0.24.3
+        with:
+          path: .
+          format: cyclonedx-json
+          output-file: reportaudit-sbom.cdx.json
+          upload-artifact: false
+          upload-release-assets: false
+
+      - name: Empaquetar el código fuente
+        run: |
+          mkdir -p dist
+          mv reportaudit-sbom.cdx.json dist/
+          git archive --format=tar.gz --prefix="reportaudit-${VERSION#v}/" \
+            -o "dist/reportaudit-${VERSION#v}.tar.gz" HEAD
+
+      - name: Calcular las huellas SHA-256
+        working-directory: dist
+        run: sha256sum reportaudit-*.tar.gz reportaudit-sbom.cdx.json > SHA256SUMS
+
+      - name: Atestar la procedencia SLSA
+        id: procedencia
+        uses: actions/attest@v4
+        with:
+          subject-path: dist/reportaudit-*.tar.gz
+
+      - name: Atestar el SBOM
+        id: sbom
+        uses: actions/attest@v4
+        with:
+          subject-path: dist/reportaudit-*.tar.gz
+          sbom-path: dist/reportaudit-sbom.cdx.json
+
+      - name: Guardar las firmas junto a la versión
+        env:
+          PROVENANCE_BUNDLE: ${{ steps.procedencia.outputs.bundle-path }}
+          SBOM_BUNDLE: ${{ steps.sbom.outputs.bundle-path }}
+        run: |
+          cp "$PROVENANCE_BUNDLE" dist/reportaudit-provenance.sigstore.json
+          cp "$SBOM_BUNDLE" dist/reportaudit-sbom.sigstore.json
+
+      - name: Crear la release en GitHub
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$VERSION" dist/* \
+            --title "ReportAudit $VERSION" \
+            --notes "CycloneDX SBOM, SHA-256 checksums and Sigstore attestations included. See SECURITY.md to verify." \
+            --verify-tag
