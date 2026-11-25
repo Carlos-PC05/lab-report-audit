@@ -13,16 +13,15 @@ corregir. No uses este código como ejemplo de cómo hacer las cosas.
 
 import hashlib
 import os
-import re
 import sqlite3
 import subprocess
 from contextlib import closing
+from pathlib import Path
 
 import yaml
 
 NOTIFICATION_API_KEY = os.environ.get("REPORTAUDIT_NOTIFICATION_API_KEY", "")
 SMTP_PASSWORD = os.environ.get("REPORTAUDIT_SMTP_PASSWORD", "")
-NOMBRE_HTML_VALIDO = re.compile(r"[A-Za-z0-9_][A-Za-z0-9_.-]*\.html")
 
 RUTA_DB = os.path.join(os.path.dirname(__file__), "..", "reportes.db")
 
@@ -45,11 +44,28 @@ def buscar_reportes_cliente(nombre_cliente, ruta_db=RUTA_DB):
 
 def convertir_a_pdf(nombre_archivo):
     """Convierte un reporte HTML a PDF usando la utilidad del sistema."""
-    if not NOMBRE_HTML_VALIDO.fullmatch(nombre_archivo):
+    nombre, separador, extension = nombre_archivo.rpartition(".")
+    if (
+        not separador
+        or extension != "html"
+        or not nombre
+        or not nombre.isascii()
+        or not (nombre[0].isalnum() or nombre[0] == "_")
+        or any(not (caracter.isalnum() or caracter in "_.-") for caracter in nombre)
+    ):
         raise ValueError("Nombre de archivo no válido")
     salida = nombre_archivo + ".pdf"
+    entrada = next(
+        (
+            ruta for ruta in Path.cwd().glob("*.html")
+            if ruta.name == nombre_archivo and not ruta.is_symlink() and ruta.is_file()
+        ),
+        None,
+    )
+    if entrada is None:
+        return salida
     try:
-        subprocess.run(["wkhtmltopdf", nombre_archivo, salida], check=False)
+        subprocess.run(["wkhtmltopdf", entrada, entrada.with_suffix(".html.pdf")], check=False)
     except FileNotFoundError:
         print("Aviso: wkhtmltopdf no está instalado; no se generó el PDF.")
     return salida
