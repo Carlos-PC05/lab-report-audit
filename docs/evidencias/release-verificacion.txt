@@ -1,0 +1,32 @@
+https://github.com/Carlos-PC05/lab-report-audit/releases/tag/v1.0.0
+
+Cinco archivos de release presentes: SHA256SUMS, reportaudit-1.0.0.tar.gz, reportaudit-provenance.sigstore.json, reportaudit-sbom.cdx.json, reportaudit-sbom.sigstore.json
+
+$ gh release download v1.0.0 --repo Carlos-PC05/lab-report-audit
+
+Exit: 0
+
+$ sha256sum -c SHA256SUMS
+reportaudit-1.0.0.tar.gz: OK
+reportaudit-sbom.cdx.json: OK
+Exit: 0
+
+$ gh attestation verify reportaudit-1.0.0.tar.gz --repo Carlos-PC05/lab-report-audit --source-ref refs/tags/v1.0.0 --signer-workflow Carlos-PC05/lab-report-audit/.github/workflows/publicar-version.yml --bundle reportaudit-provenance.sigstore.json
+
+Exit: 0
+
+$ gh attestation verify reportaudit-1.0.0.tar.gz --repo Carlos-PC05/lab-report-audit --source-ref refs/tags/v1.0.0 --signer-workflow Carlos-PC05/lab-report-audit/.github/workflows/publicar-version.yml --bundle reportaudit-sbom.sigstore.json --predicate-type https://cyclonedx.org/bom
+
+Exit: 0
+
+$ sha256sum reportaudit-1.0.0.tar.gz alterado.tar.gz
+e31467ae874252966599aaf7e2f6c7de9005474832fdb66c341ae932240cb6d9  reportaudit-1.0.0.tar.gz
+d58461c0ca4de88efb5d1357d4c259992c6210b7b162eff24e12164c0f58a1a5  alterado.tar.gz
+Exit: 0
+
+$ gh attestation verify alterado.tar.gz --repo Carlos-PC05/lab-report-audit --source-ref refs/tags/v1.0.0 --signer-workflow Carlos-PC05/lab-report-audit/.github/workflows/publicar-version.yml --bundle reportaudit-provenance.sigstore.json
+
+Error: verifying with issuer "sigstore.dev"
+Exit: 1
+
+El JSON CycloneDX descargado coincide con el predicado de la atestación del SBOM.
