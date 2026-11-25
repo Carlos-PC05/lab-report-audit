@@ -1,0 +1,5 @@
+GET /reportes (acme_corp): HTTP 200, 2 registros
+GET /reportes (o'brien_ltd): HTTP 200, 1 registros
+GET /convertir (nombre válido): HTTP 200, llamada al conversor simulada
+GET /convertir (espacio o ruta): HTTP 400, conversor sin invocar
+PBKDF2: dos hashes distintos para la misma contraseña

@@ -1,0 +1,4 @@
+- exit code: 1
+  Scanning 3 files tracked by git with 202 Code rules:
+ • Findings: 3 (3 blocking)
+Ran 188 rules on 3 files: 3 findings.
