@@ -1,0 +1,22 @@
+[
+  {
+    "RuleID": "reportaudit-hardcoded-credential",
+    "Description": "ReportAudit credential written in source code",
+    "File": "app/reporte_auditoria.py",
+    "StartLine": 21,
+    "EndLine": 21,
+    "Commit": "9745423fbec3d357ffec029a1d728ea8b337c8f7",
+    "Fingerprint": "9745423fbec3d357ffec029a1d728ea8b337c8f7:app/reporte_auditoria.py:reportaudit-hardcoded-credential:21",
+    "Secret": "REDACTED"
+  },
+  {
+    "RuleID": "reportaudit-hardcoded-credential",
+    "Description": "ReportAudit credential written in source code",
+    "File": "app/reporte_auditoria.py",
+    "StartLine": 22,
+    "EndLine": 22,
+    "Commit": "9745423fbec3d357ffec029a1d728ea8b337c8f7",
+    "Fingerprint": "9745423fbec3d357ffec029a1d728ea8b337c8f7:app/reporte_auditoria.py:reportaudit-hardcoded-credential:22",
+    "Secret": "REDACTED"
+  }
+]
