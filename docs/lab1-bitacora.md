@@ -77,18 +77,20 @@ En el [PR #25](https://github.com/Carlos-PC05/lab-report-audit/pull/25) la consu
 
 [Pruebas locales](evidencias/verificacion-auditoria.txt): la consulta devolvió dos reportes para `acme_corp` y uno para el cliente con apóstrofo. Un nombre con espacio o con ruta recibió HTTP 400. Para el nombre válido se simuló la llamada a `wkhtmltopdf` porque el binario no estaba instalado. Semgrep pasó después del cambio. Las cuatro pruebas añadidas al CI pasaron localmente con Python 3.12 y cubrieron el 95 % de las líneas del módulo de lógica.
 
-El PR #25 se fusionó y el análisis de `main` terminó bien. Las cuatro alertas de CodeQL se cerraron automáticamente como [Fixed](evidencias/codeql-despues.json). SonarQube sigue mostrando `python:S4502`, sobre CSRF. No quedan hotspots en el panel. La actualización de dependencias va en el [PR #21](https://github.com/Carlos-PC05/lab-report-audit/pull/21), que propone Flask 3.1.3, Jinja2 3.1.6 y Werkzeug 3.1.9. CodeQL señala el código de la aplicación; Dependabot mira versiones de paquetes. Por eso corregir uno de los dos grupos no cierra automáticamente el otro.
+El PR #25 se fusionó y el análisis de `main` terminó bien. Las cuatro alertas de CodeQL se cerraron automáticamente como [Fixed](evidencias/codeql-despues.json). SonarQube sigue mostrando `python:S4502`, sobre CSRF. No quedan hotspots en el panel. El [PR #21](https://github.com/Carlos-PC05/lab-report-audit/pull/21) se fusionó con Flask 3.1.3, Jinja2 3.1.6 y Werkzeug 3.1.9. Actualicé el entorno local y `pip check` pasó. CodeQL señala el código de la aplicación; Dependabot mira versiones de paquetes. Por eso corregir uno de los dos grupos no cierra automáticamente el otro.
 
 ## Parte N. Antes y después
 
+Repetí los escaneos con el código y el lockfile de `main` en `961268e`. Guardé el [SBOM nuevo](evidencias/sbom-despues.cyclonedx.json) y la [salida de las pruebas](evidencias/pruebas-despues.txt). Semgrep y las cuatro pruebas pasaron. El [pipeline de main](https://github.com/Carlos-PC05/lab-report-audit/actions/runs/45654981084) también terminó bien.
+
 | Medida | Antes | Después |
 | --- | --- | --- |
-| Semgrep, archivos de `app/` | 3 hallazgos bloqueantes | 0 bloqueantes en la rama del PR #25 |
+| Semgrep, archivos de `app/` | 3 hallazgos bloqueantes | 0 bloqueantes en el código fusionado |
 | CodeQL, alertas abiertas en `main` | 4 | 0 abiertas; 4 cerradas como Fixed |
 | SonarQube Cloud, vulnerabilidades y hotspots de `main` | 6 vulnerabilidades y 0 hotspots | 1 vulnerabilidad y 0 hotspots |
-| Grype, avisos del SBOM | 13 | Pendiente de actualizar dependencias |
-| Trivy, avisos del lockfile | 13 | Pendiente de actualizar dependencias |
-| Dependabot, alertas abiertas | 12 | Pendiente de actualizar dependencias |
+| Grype, avisos del SBOM | 13 | [0](evidencias/grype-despues.txt) |
+| Trivy, avisos del lockfile | 13 | [0](evidencias/trivy-despues.txt) |
+| Dependabot, alertas abiertas | 12 en la primera medición, 13 antes del merge | [0 en la consulta posterior al merge](evidencias/dependabot-despues.json) |
 
 ## Partes O a T
 
