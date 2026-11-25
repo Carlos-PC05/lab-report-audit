@@ -1,0 +1,9 @@
+Repetición de la parte H en un clon temporal. Prueba sintética con MD5.
+git commit -m "test: exercise local Semgrep blocking"
+SAST local (Semgrep).....................................................Failed
+- hook id: semgrep
+- exit code: 1
+    ❯❱ python.lang.security.insecure-hash-algorithms-md5.insecure-hash-algorithm-md5
+            5┆ return hashlib.md5(b"test fixture").hexdigest()
+HEAD antes y después: 93235d0e8254276e824ac4c79e11178b85cf6101
+El commit no se creó.

@@ -1,0 +1,7 @@
+PR de prueba #29 (borrador)
+https://github.com/Carlos-PC05/lab-report-audit/pull/29
+Check fallido: SCA - pip-audit
+https://github.com/Carlos-PC05/lab-report-audit/actions/runs/45656747937/job/139355370548
+
+2026-11-25T16:42:22.4861711Z [werkzeug](https://pypi.org/project/werkzeug/) | 3.1.8 | [PYSEC-2026-4312](https://osv.dev/vulnerability/PYSEC-2026-4312) | 3.1.9
+2026-11-25T16:42:22.4867709Z Found 1 known vulnerability in 1 package

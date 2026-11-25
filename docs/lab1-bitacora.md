@@ -20,7 +20,7 @@ Esta tabla es una revisión del código antiguo. No es una captura de la auditor
 
 ## Partes G y H. Detección antes de corregir
 
-SonarQube Cloud tenía [seis vulnerabilidades abiertas](evidencias/sonar-antes.json) y cero hotspots en `main`. CodeQL tenía [cuatro alertas abiertas](evidencias/codeql-antes.json): SQL, comandos, hash débil y registro de datos sensibles. Semgrep [terminó con código 1](evidencias/semgrep-antes.txt) y tres hallazgos bloqueantes. El código 1 sirve como evidencia de que el hook detectó problemas. El código 2 que apareció antes era un fallo del motor, que dejó de ocurrir al usar Python 3.12 para el hook. No se ha recuperado la captura original del commit bloqueado.
+SonarQube Cloud tenía [seis vulnerabilidades abiertas](evidencias/sonar-antes.json) y cero hotspots en `main`. CodeQL tenía [cuatro alertas abiertas](evidencias/codeql-antes.json): SQL, comandos, hash débil y registro de datos sensibles. Semgrep [terminó con código 1](evidencias/semgrep-antes.txt) y tres hallazgos bloqueantes. El código 1 sirve como evidencia de que el hook detectó problemas. El código 2 que apareció antes era un fallo del motor, que dejó de ocurrir al usar Python 3.12 para el hook. No se ha recuperado la captura original. Repetí la prueba en un clon temporal y guardé la [salida del commit bloqueado](evidencias/semgrep-commit-prueba.txt). Comprobé que el commit no se creó.
 
 | Hallazgo | SonarQube Cloud | CodeQL | Semgrep | Trivy |
 | --- | --- | --- | --- | --- |
@@ -92,9 +92,77 @@ Repetí los escaneos con el código y el lockfile de `main` en `961268e`. Guard�
 | Trivy, avisos del lockfile | 13 | [0](evidencias/trivy-despues.txt) |
 | Dependabot, alertas abiertas | 12 en la primera medición, 13 antes del merge | [0 en la consulta posterior al merge](evidencias/dependabot-despues.json) |
 
-## Partes O a T
+## Bloque final. Publicar y demostrar
 
-Pendientes de completar con evidencias de las ejecuciones y los PR correspondientes.
+### O. Secretos en el historial
+
+Instalé Gitleaks 8.30.1 después de comprobar el SHA-256 publicado con el binario descargado. El historial completo incluía 21 commits en el momento del escaneo.
+
+| Escaneo | Hallazgos | Commit |
+| --- | --- | --- |
+| Código de `app/`, reglas por defecto | 0 | — |
+| Historial, reglas por defecto | 1 | Importación |
+| Historial, con la regla de ReportAudit | 2 | `9745423` |
+| Historial, con las huellas en `.gitleaksignore` | 0 pendientes | — |
+| Código de `app/`, con la regla de ReportAudit | 0 | — |
+
+El [informe](evidencias/gitleaks-historial.json) tiene solo datos del hallazgo y oculta los valores. Revisé que las dos huellas coinciden con las credenciales de práctica del commit de importación. Hice una prueba con un valor ficticio nuevo y la regla sí lo detectó.
+
+Los valores se retiraron del código actual en la fase M, pero los commits viejos conservan sus archivos. La excepción solo reconoce las huellas de los dos avisos antiguos; la regla sigue activa para cualquier hallazgo nuevo. Si alguna credencial fuese real, habría que revocarla o rotarla en el proveedor. En este laboratorio eran valores de práctica y no se hizo una rotación externa.
+
+### P. Checks obligatorios
+
+El [PR #28](https://github.com/Carlos-PC05/lab-report-audit/pull/28) añade dos checks. pip-audit revisa las versiones fijadas en el lockfile y Gitleaks busca secretos en los commits con la regla de ReportAudit. En local, pip-audit encontró 0 vulnerabilidades y Gitleaks encontró 0 avisos pendientes. Verifiqué en GitHub que Secret scanning y Push protection están activados.
+
+| Check | ¿Exigido en main? | Resultado del PR de prueba |
+| --- | --- | --- |
+| SAST - SonarQube Cloud | Sí | Pasó |
+| SAST - CodeQL | Sí | Pasó |
+| SCA - pip-audit | Sí | Falló por PYSEC-2026-4312 |
+| Secretos - Gitleaks | Sí | Pasó |
+
+Para el [PR de prueba #29](https://github.com/Carlos-PC05/lab-report-audit/pull/29) bajé Werkzeug a 3.1.8. Usé esa versión porque todavía es vulnerable y sí cumple la versión mínima que pide Flask. Así pude comprobar el fallo de pip-audit sin provocar un fallo de instalación. El borrador se cerró sin fusionar. Guardé la [salida del check](evidencias/sca-prueba.txt); la captura visual queda pendiente.
+
+### Q. Divulgación coordinada
+
+La política de seguridad se fusionó en el [PR #30](https://github.com/Carlos-PC05/lab-report-audit/pull/30) y GitHub tiene activado el canal de informes privados. El informe de práctica de `igallego9-stack` pasó de triage a borrador privado.
+
+- Identificador: `GHSA-5j4w-rv57-cgm9`.
+- Clasificación: CWE-89. CVSS 3.1 de 4,0 (media) para el escenario local de la guía. El servicio escucha en localhost y el impacto evaluado es la lectura de información.
+- Vector: `CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N`.
+- Versiones del simulacro: anteriores a 1.0.0. Versión corregida: 1.0.0. El cambio de código está en el PR #25.
+- Se añadió el crédito del informante. GitHub lo muestra pendiente de aceptación.
+- Envié el informe recíproco al repositorio de mi compañero. GitHub lo recibió en triage y mi compañero lo aceptó como borrador. Cerré el issue #11 después de completar ambos papeles. La captura visual queda pendiente. Ningún aviso se publicó ni recibió un CVE.
+
+### R. Versión 1.0.0 verificable
+
+La [release v1.0.0](https://github.com/Carlos-PC05/lab-report-audit/releases/tag/v1.0.0) incluye cinco archivos. Los descargué fuera del repositorio y guardé la [salida de verificación](evidencias/release-verificacion.txt).
+
+| Comprobación | Resultado |
+| --- | --- |
+| SHA-256 del paquete y del SBOM | Las dos huellas coinciden. |
+| Procedencia SLSA | La firma corresponde al workflow de publicación de este repositorio y a la etiqueta `v1.0.0`. |
+| Atestación CycloneDX | La firma se verifica para ese paquete y el JSON publicado coincide con el predicado firmado. |
+| Copia con unos bytes añadidos | La huella cambia y la verificación rechaza la copia. |
+
+### S. OpenSSF Scorecard
+
+La [primera ejecución](https://github.com/Carlos-PC05/lab-report-audit/actions/runs/45660767573) dio **7,1/10** en el commit `93235d0`. Guardé el [resultado completo](evidencias/scorecard.json).
+
+| Check | Puntuación | Qué la explica |
+| --- | --- | --- |
+| Pinned-Dependencies | 0 | Hay acciones referenciadas por etiquetas en vez de hashes de commit. |
+| Maintained | 0 | El repositorio tiene menos de 90 días de historial para esta medición. |
+| CII-Best-Practices | 0 | El proyecto no tiene el badge de buenas prácticas de OpenSSF. |
+| Fuzzing | 0 | No hay una campaña de fuzzing configurada. |
+| License | 0 | Scorecard no encontró un archivo de licencia. |
+| Contributors | 0 | Es un proyecto académico y no detectó contribuciones de organizaciones. |
+
+Hay seis checks empatados con la nota más baja. Signed-Releases obtuvo 8/10 y reconoció un artefacto firmado. Branch-Protection apareció sin puntuación porque el token de Scorecard no puede leer la regla clásica. GitHub sí muestra la regla con cuatro checks y una aprobación cuando se consulta con acceso de administrador.
+
+### T. Expediente de evidencias
+
+Preparé el [expediente de evidencias](cra/expediente-evidencias.md) con doce filas. Cada una enlaza una prueba y explica cómo comprobarla. Está pendiente de que mi compañero revise los enlaces y ejecute una verificación.
 
 ## Preguntas de comprobación
 
@@ -109,4 +177,13 @@ Pendientes de completar con evidencias de las ejecuciones y los PR correspondien
 9. Un VEX deja registrada la razón por la que un aviso no afecta a un producto en una configuración concreta. En este proyecto el aviso del depurador de Werkzeug no aplica al arranque documentado porque el depurador está apagado. Aun así conviene actualizar.
 10. El instalador compara el SHA-256 del archivo descargado con el publicado para la versión fijada. La coincidencia comprueba la integridad respecto a esa referencia, pero no demuestra que el proyecto o su canal de publicación estuvieran libres de manipulación.
 
-Preguntas 11 a 17 pendientes de completar con las evidencias de O a T.
+11. Gitleaks no detecta los valores de práctica en el código actual porque ahora se leen del entorno. El historial todavía conserva las líneas originales. Para una credencial real, la medida que corta el riesgo es revocarla o rotarla; cambiar el archivo no invalida la credencial vieja.
+
+12. No configuré el check de dependencias como obligatorio antes de actualizar el lockfile. Si ya sabes que falla, bloquearía incluso un PR que corrige otra parte del proyecto. Primero dejé limpio el punto de partida y después cerré la puerta para que no se pierda esa mejora.
+13. Dependabot avisa de un problema y puede proponer su actualización. El check obligatorio de pip-audit decide si un PR puede entrar en `main`. En el PR #29 se vio esa diferencia.
+
+14. La atestación vincula el paquete a una etiqueta, un repositorio y un workflow. El SBOM firmado vincula la lista de componentes a ese paquete. SHA-256 verifica la huella, pero alguien que pudiera cambiar un paquete y su lista de sumas podría publicar dos archivos que coincidan entre sí. Ninguna de estas comprobaciones demuestra por sí sola que el código esté libre de errores.
+15. Un informe privado permite revisar el problema y acordar la corrección antes de que sus detalles sean públicos. `SECURITY.md` dice qué versiones reciben parches, cómo enviar el informe y qué respuesta puede esperar quien lo envía.
+
+16. El 0 en Maintained refleja que el repositorio era reciente para el período que usa Scorecard. Es una señal para mirar su historial, no una demostración de que el código tenga una vulnerabilidad.
+17. La guía planteaba en teoría un SBOM, una política y controles de seguridad. Ahora hay un SBOM atestado, una release verificable, un canal privado probado y checks obligatorios con una prueba de fallo. El expediente no incluye una evaluación completa de riesgos, una declaración UE de conformidad ni el marcado CE. No he recuperado el texto de mi B5, así que esta comparación es con lo que pide la guía y queda pendiente cotejarla con mi respuesta.
