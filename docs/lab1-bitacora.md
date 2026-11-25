@@ -20,7 +20,7 @@ Esta tabla es una revisión del código antiguo. No es una captura de la auditor
 
 ## Partes G y H. Detección antes de corregir
 
-SonarQube Cloud tenía [seis vulnerabilidades abiertas](evidencias/sonar-antes.json) y cero hotspots en `main`. CodeQL tenía [cuatro alertas abiertas](evidencias/codeql-antes.json): SQL, comandos, hash débil y registro de datos sensibles. Semgrep [terminó con código 1](evidencias/semgrep-antes.txt) y tres hallazgos bloqueantes. El código 1 sirve como evidencia de que el hook detectó problemas. El código 2 que apareció antes era un fallo del motor, que dejó de ocurrir al usar Python 3.12 para el hook. No se ha recuperado la captura original. Repetí la prueba en un clon temporal y guardé la [salida del commit bloqueado](evidencias/semgrep-commit-prueba.txt). Comprobé que el commit no se creó.
+SonarQube Cloud tenía [seis vulnerabilidades abiertas](evidencias/sonar-antes.json) y cero hotspots en `main`. CodeQL tenía [cuatro alertas abiertas](evidencias/codeql-antes.json): SQL, comandos, hash débil y registro de datos sensibles. Semgrep [terminó con código 1](evidencias/semgrep-antes.txt) y tres hallazgos bloqueantes. El código 1 sirve como evidencia de que el hook detectó problemas. El código 2 que apareció antes era un fallo del motor, que dejó de ocurrir al usar Python 3.12 para el hook. Repetí la prueba en un clon temporal. Guardé la [salida del commit bloqueado](evidencias/semgrep-commit-prueba.txt) y preparé una [captura de esa salida](evidencias/capturas/h-semgrep.png). Comprobé que el commit no se creó.
 
 | Hallazgo | SonarQube Cloud | CodeQL | Semgrep | Trivy |
 | --- | --- | --- | --- | --- |
@@ -121,7 +121,7 @@ El [PR #28](https://github.com/Carlos-PC05/lab-report-audit/pull/28) añade dos 
 | SCA - pip-audit | Sí | Falló por PYSEC-2026-4312 |
 | Secretos - Gitleaks | Sí | Pasó |
 
-Para el [PR de prueba #29](https://github.com/Carlos-PC05/lab-report-audit/pull/29) bajé Werkzeug a 3.1.8. Usé esa versión porque todavía es vulnerable y sí cumple la versión mínima que pide Flask. Así pude comprobar el fallo de pip-audit sin provocar un fallo de instalación. El borrador se cerró sin fusionar. Guardé la [salida del check](evidencias/sca-prueba.txt); la captura visual queda pendiente.
+Para el [PR de prueba #29](https://github.com/Carlos-PC05/lab-report-audit/pull/29) bajé Werkzeug a 3.1.8. Usé esa versión porque todavía es vulnerable y sí cumple la versión mínima que pide Flask. Así pude comprobar el fallo de pip-audit sin provocar un fallo de instalación. El borrador se cerró sin fusionar. Guardé la [salida del check](evidencias/sca-prueba.txt) y una [captura de GitHub Actions](evidencias/capturas/p-pip-audit-github.png).
 
 ### Q. Divulgación coordinada
 
@@ -132,7 +132,7 @@ La política de seguridad se fusionó en el [PR #30](https://github.com/Carlos-P
 - Vector: `CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N`.
 - Versiones del simulacro: anteriores a 1.0.0. Versión corregida: 1.0.0. El cambio de código está en el PR #25.
 - Se añadió el crédito del informante. GitHub lo muestra pendiente de aceptación.
-- Envié el informe recíproco al repositorio de mi compañero. GitHub lo recibió en triage y mi compañero lo aceptó como borrador. Cerré el issue #11 después de completar ambos papeles. La captura visual queda pendiente. Ningún aviso se publicó ni recibió un CVE.
+- Envié el informe recíproco al repositorio de mi compañero. GitHub lo recibió en triage y mi compañero lo aceptó como borrador. Cerré el issue #11 después de completar ambos papeles. Guardé una [captura de los metadatos comprobados por la API](evidencias/capturas/q-aviso-privado-metadatos.png). La pantalla web del borrador requiere acceso autenticado. Ningún aviso se publicó ni recibió un CVE.
 
 ### R. Versión 1.0.0 verificable
 
@@ -187,3 +187,14 @@ Preparé el [expediente de evidencias](cra/expediente-evidencias.md) con doce fi
 
 16. El 0 en Maintained refleja que el repositorio era reciente para el período que usa Scorecard. Es una señal para mirar su historial, no una demostración de que el código tenga una vulnerabilidad.
 17. La guía planteaba en teoría un SBOM, una política y controles de seguridad. Ahora hay un SBOM atestado, una release verificable, un canal privado probado y checks obligatorios con una prueba de fallo. El expediente no incluye una evaluación completa de riesgos, una declaración UE de conformidad ni el marcado CE. No he recuperado el texto de mi B5, así que esta comparación es con lo que pide la guía y queda pendiente cotejarla con mi respuesta.
+
+## Capturas del laboratorio
+
+| Paso | Captura | Origen |
+| --- | --- | --- |
+| B. Servicio local | [Respuesta con dos reportes de acme_corp](evidencias/capturas/b-servicio-reportes.png) | Navegador y base de datos de ejemplo. |
+| H. Hook de Semgrep | [Commit bloqueado](evidencias/capturas/h-semgrep.png) | Salida de una repetición del ejercicio en un clon temporal. |
+| P.3. Check SCA | [Job en rojo](evidencias/capturas/p-pip-audit-github.png), [borrador cerrado](evidencias/capturas/p-pr-cerrado.png), [detalle de pip-audit](evidencias/capturas/p-pip-audit-salida.png) | Pantallas públicas de GitHub y extracto del log del job. |
+| Q.3. Aviso privado | [Estado, CVSS y versiones](evidencias/capturas/q-aviso-privado-metadatos.png) | Metadatos comprobados mediante la API de GitHub. La captura no contiene la conversación ni la descripción privada. |
+| R.2. Release | [Archivos de v1.0.0 en GitHub](evidencias/capturas/release-v1.0.0.png) | Página pública de la release. |
+| R.3. Verificación | [Huellas, atestaciones y rechazo de la copia alterada](evidencias/capturas/r-verificacion-release.png) | Salida registrada al verificar los archivos descargados. |
