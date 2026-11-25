@@ -1,0 +1,30 @@
+[
+  {
+    "fixed_at": "2026-11-25T15:49:37Z",
+    "number": 4,
+    "rule": "py/weak-sensitive-data-hashing",
+    "state": "fixed",
+    "url": "https://github.com/Carlos-PC05/lab-report-audit/security/code-scanning/4"
+  },
+  {
+    "fixed_at": "2026-11-25T15:49:37Z",
+    "number": 3,
+    "rule": "py/command-line-injection",
+    "state": "fixed",
+    "url": "https://github.com/Carlos-PC05/lab-report-audit/security/code-scanning/3"
+  },
+  {
+    "fixed_at": "2026-11-25T15:49:37Z",
+    "number": 2,
+    "rule": "py/sql-injection",
+    "state": "fixed",
+    "url": "https://github.com/Carlos-PC05/lab-report-audit/security/code-scanning/2"
+  },
+  {
+    "fixed_at": "2026-11-25T15:49:37Z",
+    "number": 1,
+    "rule": "py/clear-text-logging-sensitive-data",
+    "state": "fixed",
+    "url": "https://github.com/Carlos-PC05/lab-report-audit/security/code-scanning/1"
+  }
+]
